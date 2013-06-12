@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperExtensionsLibrary.EntityFramework", "HelperExtensionsLibrary.EntityFramework\HelperExtensionsLibrary.EntityFramework.csproj", "{94FE6056-B111-4868-8432-B639C451B731}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperExtensionsLibrary.EntityFramework.Fixture", "HelperExtensionsLibrary.EntityFramework.Fixture\HelperExtensionsLibrary.EntityFramework.Fixture.csproj", "{D648D0F6-D92B-407C-BC5B-8DBD3D7444A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{94FE6056-B111-4868-8432-B639C451B731}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94FE6056-B111-4868-8432-B639C451B731}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94FE6056-B111-4868-8432-B639C451B731}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D648D0F6-D92B-407C-BC5B-8DBD3D7444A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D648D0F6-D92B-407C-BC5B-8DBD3D7444A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D648D0F6-D92B-407C-BC5B-8DBD3D7444A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D648D0F6-D92B-407C-BC5B-8DBD3D7444A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Efim Goncharuk")]
 [assembly: AssemblyProduct("HelperExtensionsLibrary.EntityFramework")]
-[assembly: AssemblyCopyright("Efimster")]
+[assembly: AssemblyCopyright("Copyright © Efimster")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("7486c09f-1f74-4ac2-9973-7d2d1090dde8")]
-
+[assembly: InternalsVisibleTo("HelperExtensionsLibrary.EntityFramework.Fixture")]
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
