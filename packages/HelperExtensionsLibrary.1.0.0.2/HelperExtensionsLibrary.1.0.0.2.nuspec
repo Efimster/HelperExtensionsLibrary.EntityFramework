@@ -13,5 +13,8 @@
     <releaseNotes>first release</releaseNotes>
     <copyright>Efimster</copyright>
     <tags>Helper Extention IEnumerable</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="5.0.6" />
+    </dependencies>
   </metadata>
 </package>

@@ -11,17 +11,17 @@ using System.Linq;
 
 namespace HelperExtensionsLibrary.EntityFramework.Testing
 {
-    public partial class TestRepositary<T> : ITestRepositary<T>
+    public partial class TestRepository<T> : ITestRepository<T>
            where T : class
     {
         /// <summary>
-        /// Represens item of test repositary
+        /// Represens item of test repository
         /// </summary>
-        public class Item : IEquatable<Item>
+        public partial class Item : IEquatable<Item>
         {
             public T Value { get; set; }
             public ItemState State { get; set; }
-            private static IList<Action<T>> ForeignKeysActions { get; set; }
+            private static IList<Action<T>> MinMaxLengthConstraintActions { get; set; }
             private static IList<DbGeneratedIdentityAction> DbGeneratedActions { get; set; }
             private static IList<string> KeyProperties { get; set; }
 
@@ -31,65 +31,14 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
                 ForeignKeysActions = GetForeignKeyRelations();
                 DbGeneratedActions = GetDatabaseGeneratedIdentitys();
                 KeyProperties = GetKeyData();
+                MinMaxLengthConstraintActions = GetMaxLengthConstraintActions();//.Union(GetMinLengthConstraintActions()).ToList();
             }
 
             public Item()
             {
                 State = ItemState.Unchanged;
             }
-            /// <summary>
-            /// Returns list of constructed foreign key generation action
-            /// </summary>
-            /// <returns></returns>
-            internal static IList<Action<T>> GetForeignKeyRelations()
-            {
-                var type = typeof(T);
-
-                var foreignKeyActions = new List<Action<T>>();
-
-                foreach (var prop in type.GetProperties().FilterPropertiesByAttribute<ForeignKeyAttribute>())
-                {
-                    var attr = prop.GetCustomAttribute<ForeignKeyAttribute>();
-
-                    var act = TestRepositaryHelper.ConstructForeignKeySetter<T>(prop.Name, attr.Name);
-                    foreignKeyActions.Add(act);
-                }
-
-                return foreignKeyActions;
-            }
-            /// <summary>
-            /// Returns list of constructed database identity generation action
-            /// </summary>
-            /// <returns></returns>
-            internal static IList<DbGeneratedIdentityAction> GetDatabaseGeneratedIdentitys()
-            {
-                var type = typeof(T);
-                var dbGeneratedActions = new List<DbGeneratedIdentityAction>();
-
-                var properties = type.GetProperties().FilterPropertiesByAttribute<DatabaseGeneratedAttribute, PropertyInfo>(
-                    (attr, prop) => attr.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity, 
-                    (attr, prop) => prop
-                    );
-                DatabaseGeneratedAttribute addAttribute = null;
-                var propertiesKeys = type.GetProperties().FilterPropertiesByAttribute<KeyAttribute, PropertyInfo>(
-                    (attr, prop) => (addAttribute = prop.GetCustomAttribute<DatabaseGeneratedAttribute>()) == null || addAttribute.DatabaseGeneratedOption == DatabaseGeneratedOption.Identity,
-                    (attr, prop) => prop
-                    ).ToList();
-
-                if (propertiesKeys.Count > 1)
-                    propertiesKeys = new List<PropertyInfo>(1);
-
-
-                properties = properties.Union(propertiesKeys);
-
-                foreach (var prop in properties)
-                {
-                    var act = new DbGeneratedIdentityAction(TestRepositaryHelper.ConstructDbGeneratedIdentity<T>(prop.Name));
-                    dbGeneratedActions.Add(act);
-                }
-
-                return dbGeneratedActions;
-            }
+            
             /// <summary>
             /// Returns list of key properties
             /// </summary>
@@ -130,20 +79,8 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
             {
                 return Value.GetHashCode();
             }
-            /// <summary>
-            /// Update foreign keys values
-            /// </summary>
-            public void TriggerForeignKeyActons()
-            {
-                ForeignKeysActions.ForEach(act => act(Value));
-            }
-            /// <summary>
-            /// Update generated identity keys values
-            /// </summary>
-            public void TriggerDbGeneratedActons()
-            {
-                DbGeneratedActions.ForEach(act => act.Do(Value, ++act.NextValue));
-            }
+
+
         }
         /// <summary>
         /// Encapsulates action and identity key value

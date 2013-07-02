@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HelperExtensionsLibrary.EntityFramework.Fixture.Models
 {
-    public class TestModelDbRepositary : RepositaryBase<TestModel>
+    public class TestModelDbRepository : RepositoryBase<TestModel>
     {
-        public TestModelDbRepositary(TestContext context)
+        public TestModelDbRepository(TestContext context)
             : base(context, context.Tests)
         {
             

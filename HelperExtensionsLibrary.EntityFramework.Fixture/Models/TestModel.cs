@@ -13,7 +13,11 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int TestId { get; set; }
+        [MaxLength(10)]
+        [MinLength(2)]
         public string TestData { get; set; }
+        [NotMapped]
+        public DateTime? NotMapped { get; set; }
     }
 
     public class TestModel2
@@ -54,5 +58,30 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         public string TestData { get; set; }
         [ForeignKey("TestId")]
         public TestModel5 TestModelObject { get; set; }
+    }
+
+    public class TestModel7
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int Model7Id { get; set; }
+        public string DataString { get; set; }
+        public DateTime DataDateTime{ get; set; }
+        public DateTime? NullableDateTime { get; set; }
+        public int DataInt { get; set; }
+    }
+
+    public class TestModel8
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int Id { get; set; }
+        public int Model7Id { get; set; }
+        public string DataString { get; set; }
+        public DateTime DataDateTime { get; set; }
+        public DateTime? NullableDateTime { get; set; }
+        public int DataInt { get; set; }
+        [ForeignKey("Model7Id")]
+        public TestModel7 TestModel7Object { get; set; }
     }
 }

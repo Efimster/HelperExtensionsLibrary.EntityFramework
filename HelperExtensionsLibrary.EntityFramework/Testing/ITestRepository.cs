@@ -1,10 +1,10 @@
 ﻿
 namespace HelperExtensionsLibrary.EntityFramework.Testing
 {
-    public interface ITestRepositary<T> : IRepositary<T>
+    public interface ITestRepository<T> : IRepository<T>
     {
         /// <summary>
-        /// Clear all repositary data
+        /// Clear all repository data
         /// </summary>
         void Clear();
     }

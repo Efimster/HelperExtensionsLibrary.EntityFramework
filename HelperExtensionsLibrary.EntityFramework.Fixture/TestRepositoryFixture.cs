@@ -3,25 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HelperExtensionsLibrary.EntityFramework.Ninject;
 using HelperExtensionsLibrary.EntityFramework.Testing;
 using Should.Fluent;
 using Xunit;
 
 namespace HelperExtensionsLibrary.EntityFramework.Fixture
 {
-    public class TestRepositaryFixture : RepositaryFixture
+    public class TestRepositoryFixture : RepositoryFixture
     {
-        protected override void ClearRepositary()
+        protected override void InitializeRepoDispenser()
         {
-            using (var repositary = GetNewDbRepositary())
+            RepoBuilder = new RepositoriesDispenser(new SharedRepositoriesFixture.DependenciesTestModule());
+            Repositories = RepoBuilder.Share();
+        }
+        
+        
+        
+        protected override void ClearRepository()
+        {
+            using (var repository = GetNewDbRepository())
             {
-                ((ITestRepositary<TestModel>)repositary).Clear();
+                ((ITestRepository<TestModel>)repository).Clear();
+                repository.UpdateAll();
             }
         }
 
-        protected override IRepositary<TestModel> GetNewDbRepositary()
+        protected override IRepository<TestModel> GetNewDbRepository()
         {
-            return new TestRepositary<TestModel>();
+            return new TestRepository<TestModel>();
         }
 
         /// <summary>
@@ -41,7 +51,7 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
             base.GetOneFixture();
         }
         /// <summary>
-        /// Add entity to repositary
+        /// Add entity to repository
         /// </summary>
         [Fact]
         protected override void AddOneFixture()
@@ -63,6 +73,30 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         protected override void DeleteRangeFixture()
         {
             base.DeleteRangeFixture();
+        }
+
+        [Fact]
+        protected override void IsAttachedFixture()
+        {
+            base.IsAttachedFixture();
+        }
+
+        [Fact]
+        protected override void AddRangeFixture()
+        {
+            base.AddRangeFixture();
+        }
+
+        [Fact]
+        protected override void MinMaxConstraintsFixture()
+        {
+            base.MinMaxConstraintsFixture();
+        }
+
+        [Fact]
+        protected void IncludeFixture()
+        {
+            base.IncludeFixture();
         }
     }
 }

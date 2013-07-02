@@ -42,7 +42,7 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         [Fact]
         public void SqlFilterQueryFixture()
         {
-            ClearRepositary();
+            ClearRepository();
             using (var context = new TestContext())
             {
                 context.Tests.Add(new TestModel() {TestId = 1, TestData = "data1"});
@@ -57,10 +57,10 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
                 list[0].TestId.Should().Equal(1);
 
             }
-            ClearRepositary();
+            ClearRepository();
         }
 
-        private void ClearRepositary()
+        private void ClearRepository()
         {
             using (var context = new TestContext())
             {

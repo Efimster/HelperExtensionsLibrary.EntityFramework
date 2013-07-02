@@ -42,6 +42,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\HelperExtensionsLibrary.1.0.0.2\lib\net45\HelperExtensionsLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.3.0.1.10\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -53,19 +60,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EFExtensions.cs" />
+    <Compile Include="GeneralRepository.cs" />
+    <Compile Include="Ninject\NinjectActivationBlock.cs" />
+    <Compile Include="Ninject\RepositoriesDispenser.cs" />
+    <Compile Include="Ninject\RepositoriesNinjectModule.cs" />
+    <Compile Include="Ninject\SharedRepositories.cs" />
     <Compile Include="NonSystemTableSqlGenerator.cs" />
-    <Compile Include="RepositaryBase.cs" />
-    <Compile Include="IRepositary.cs" />
+    <Compile Include="RepositoryBase.cs" />
+    <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Testing\ITestRepositary.cs" />
-    <Compile Include="Testing\TestRepositary.cs" />
-    <Compile Include="Testing\TestRepositary.Item.cs" />
-    <Compile Include="Testing\TestRepositaryHelper.cs" />
+    <Compile Include="Testing\ITestRepository.cs" />
+    <Compile Include="Testing\TestRepository.Item.DbGenerated.cs" />
+    <Compile Include="Testing\TestRepository.Item.ForeignKeys.cs" />
+    <Compile Include="Testing\TestRepository.Item.MinMaxLengthConstraints.cs" />
+    <Compile Include="Testing\QueryBuilder.cs" />
+    <Compile Include="Testing\TestRepository.cs" />
+    <Compile Include="Testing\TestRepository.Item.cs" />
+    <Compile Include="Testing\TestRepositoryHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

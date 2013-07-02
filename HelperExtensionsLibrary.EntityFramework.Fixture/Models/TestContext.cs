@@ -15,6 +15,8 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         public DbSet<TestModel> Tests { get; set; }
         public DbSet<TestModel2> Tests2 { get; set; }
         public DbSet<TestModel3> Tests3 { get; set; }
+        public DbSet<TestModel7> Tests7 { get; set; }
+        public DbSet<TestModel8> Tests8 { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
