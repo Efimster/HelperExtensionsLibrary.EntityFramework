@@ -4,15 +4,15 @@ using System.Data.Entity;
 using System.Data.Entity.Core;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Transactions;
 using HelperExtensionsLibrary.EntityFramework.Fixture.Migrations;
 using HelperExtensionsLibrary.EntityFramework.Fixture.Models;
 using HelperExtensionsLibrary.EntityFramework.Ninject;
+using HelperExtensionsLibrary.EntityFramework.Testing;
 using Should.Fluent;
 using Xunit;
 using Xunit.Extensions;
-using HelperExtensionsLibrary.EntityFramework.Testing;
+
 
 namespace HelperExtensionsLibrary.EntityFramework.Fixture
 {
@@ -170,7 +170,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
             {
                 var one = new TestModel() { TestId = 1}; 
                 Assert.Throws<InvalidOperationException>(() => repository.DeleteOne(one));
-                //repository.AttachOne(one);
                 repository.DeleteOne(one, attache: true, autoupdate: true);
             }
 
@@ -342,7 +341,7 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
 
 
         [Fact]
-        protected void IncludeFixture()
+        protected virtual void IncludeFixture()
         {
             ClearSharedRepositories();
 
@@ -371,6 +370,55 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
                 res.TestModel7Object.DataInt.Should().Equal(7);
                 
             }
+
+            ClearSharedRepositories();
+        }
+
+        [Fact]
+        protected virtual void TransactionScopeFixture()
+        {
+            ClearSharedRepositories();
+            
+            using (var scope = new TransactionScope(TransactionScopeOption.Required,
+               new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
+            {
+                using (Repositories.Use())
+                {
+                    var model7 = new TestModel7() { Model7Id = 7, DataString = "data7", DataInt = 7, DataDateTime = DateTime.Now, NullableDateTime = DateTime.Now };
+                    TestModel7Repo.AddOne(model7).UpdateAll();
+                    var model8 = new TestModel8() { Id = 8, Model7Id = 7, DataString = "data8", DataInt = 8, DataDateTime = DateTime.Now, NullableDateTime = DateTime.Now };
+                    TestModel8Repo.AddOne(model8).UpdateAll();
+                    TestModel8Repo.UpdateAll();
+
+                    scope.Complete();
+
+                    var model70 = new TestModel7() { Model7Id = 70, DataString = "data7", DataInt = 7, DataDateTime = DateTime.Now, NullableDateTime = DateTime.Now };
+                    TestModel7Repo.AddOne(model70);
+                    Assert.Throws<EntityException>(() => TestModel7Repo.UpdateAll());//The underlying provider failed on open 
+                }
+                
+            }
+
+            using (var scope = new TransactionScope(TransactionScopeOption.Required,
+              new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
+            {
+                using (Repositories.Use())
+                {
+                    var model71 = new TestModel7() { Model7Id = 71, DataString = "data7", DataInt = 7, DataDateTime = DateTime.Now, NullableDateTime = DateTime.Now };
+                    TestModel7Repo.AddOne(model71).UpdateAll();
+                    var model81 = new TestModel8() { Id = 81, Model7Id = 7, DataString = "data8", DataInt = 8, DataDateTime = DateTime.Now, NullableDateTime = DateTime.Now };
+                    TestModel8Repo.AddOne(model81).UpdateAll();
+                }
+            }
+
+            using (Repositories.Use())
+            {
+                TestModel7Repo.GetOne(x => x.Model7Id == 7).Should().Not.Be.Null();
+                TestModel8Repo.GetOne(x => x.Id == 8).Should().Not.Be.Null();
+                TestModel7Repo.GetOne(x => x.Model7Id == 71).Should().Be.Null();
+                TestModel8Repo.GetOne(x => x.Id == 81).Should().Be.Null();
+            }
+
 
             ClearSharedRepositories();
         }

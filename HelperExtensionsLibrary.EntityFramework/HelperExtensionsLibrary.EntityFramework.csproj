@@ -52,6 +52,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -70,6 +71,8 @@
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Testing\ITestRepository.cs" />
+    <Compile Include="Testing\TestRepositary.Transactions.cs" />
+    <Compile Include="Testing\TestRepositaryStorage.cs" />
     <Compile Include="Testing\TestRepository.Item.DbGenerated.cs" />
     <Compile Include="Testing\TestRepository.Item.ForeignKeys.cs" />
     <Compile Include="Testing\TestRepository.Item.MinMaxLengthConstraints.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="Testing\TestRepository.cs" />
     <Compile Include="Testing\TestRepository.Item.cs" />
     <Compile Include="Testing\TestRepositoryHelper.cs" />
+    <Compile Include="Testing\TransactionalLock.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

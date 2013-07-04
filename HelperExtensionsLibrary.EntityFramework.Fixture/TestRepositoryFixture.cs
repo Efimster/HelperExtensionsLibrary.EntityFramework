@@ -94,9 +94,15 @@ namespace HelperExtensionsLibrary.EntityFramework.Fixture
         }
 
         [Fact]
-        protected void IncludeFixture()
+        protected override void IncludeFixture()
         {
             base.IncludeFixture();
+        }
+
+        [Fact]
+        protected override void TransactionScopeFixture()
+        {
+            base.TransactionScopeFixture();
         }
     }
 }

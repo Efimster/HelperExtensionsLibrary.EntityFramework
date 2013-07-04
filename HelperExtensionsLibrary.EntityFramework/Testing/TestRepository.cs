@@ -1,41 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HelperExtensionsLibrary.Attributes;
-using HelperExtensionsLibrary.Strings;
-using HelperExtensionsLibrary.IEnumerable;
-using HelperExtensionsLibrary.Objects;
 using System.Linq.Expressions;
-using HelperExtensionsLibrary.EntityFramework.Ninject;
-using System.Reflection;
+using HelperExtensionsLibrary.Objects;
 
 namespace HelperExtensionsLibrary.EntityFramework.Testing
 {
+    /// <summary>
+    /// In-memory test repository (storage)
+    /// </summary>
+    /// <typeparam name="T">Type of storage entities</typeparam>
     public partial class TestRepository<T> : ITestRepository<T>, IEnumerable<T>
            where T : class
     {
-        private static IList<Item> DbSetInternal { get; set; }
-        public IList<Item> DbSet { get; private set; }
+        /// <summary>
+        /// In-memory data storage
+        /// </summary>
+        private static TestRepositaryStorage Storage { get; set; }
+        /// <summary>
+        /// Working data set
+        /// </summary>
+        public  IList<Item> DbSet { get; private set; }
+        /// <summary>
+        /// List of attached entities
+        /// </summary>
         private IList<T> AttachedList { get; set; }
-
-
 
         public TestRepository()
         {
-            if (DbSetInternal == null)
-                DbSetInternal = new List<Item>();
+            if (Storage == null)
+                Storage = new TestRepositaryStorage();
 
-            lock (DbSetInternal)
-            {
-                DbSet = DbSetInternal.DeepCopyByJSON();
-            }
+            DbSet = Storage.GetSnapshot(this);
             AttachedList = new List<T>();
         }
-
-
         /// <summary>
         /// Get list of entities according to predicate
         /// </summary>
@@ -71,6 +69,7 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
         {
             var item = new Item { Value = one, State = ItemState.Added };
             item.TriggerForeignKeyActons();
+
             DbSet.Add(item);
 
             if (autoupdate)
@@ -84,34 +83,8 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
         /// <returns>affected rows count</returns>
         public int UpdateAll()
         {
-            int affectedRows = 0;
-            
-            for (int i = DbSet.Count - 1; i >= 0; i--)
-            {
-                var item = DbSet[i];
-                if (item.State.IsIn(ItemState.Removed))
-                {
-                    DbSet.RemoveAt(i);
-                    affectedRows++;
-                    continue;
-                }
-
-                if (item.State.IsNotIn(ItemState.Unchanged))
-                {
-                    item.TriggerDbGeneratedActons();
-                    item.TriggerMinMaxLengthConstraintActons();
-                    item.State = ItemState.Unchanged;
-                    affectedRows++;
-                }
-            }
-
             AttachedList.Clear();
-            lock (DbSetInternal)
-            {
-                DbSetInternal = DbSet.DeepCopyByJSON();
-            }
-
-            return affectedRows;
+            return Storage.Commit(this, DbSet);
         }
         /// <summary>
         ///  Remove  entity
@@ -146,13 +119,20 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
 
             return this;
         }
-
+        /// <summary>
+        /// Disposes repository object
+        /// </summary>
         public void Dispose()
         {
-            if (IsDisposed)
+            if (IsDisposed && IsDisposedInternal)
                 return;
 
             IsDisposed = true;
+
+            //if (currentTransaction != null)
+            //    return;
+
+            IsDisposedInternal = true;
             
             DbSet = null;
             if (AttachedList != null)
@@ -162,14 +142,12 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
             }
         }
         /// <summary>
-        /// Clear all repository data
+        /// Clears working data set
         /// </summary>
         public void Clear()
         {
             DbSet.Clear();
         }
-
-
         /// <summary>
         /// Get list of entities according to predicate
         /// </summary>
@@ -206,8 +184,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
 
             return query;
         }
-
-
         /// <summary>
         /// Remove entities range
         /// </summary>
@@ -224,7 +200,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
 
             return this;
         }
-
         /// <summary>
         /// Removes entities filtered by predicate
         /// </summary>
@@ -235,7 +210,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
         {
             return DeleteRange(DbSet.Select(item => item.Value).Where(predicate.Compile()), autoupdate: autoupdate, attache: false);
         }
-
         /// <summary>
         /// Get list of all entities 
         /// </summary>
@@ -257,8 +231,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
             return one;
 
         }
-
-
         /// <summary>
         /// Checks whether entity is attached to context 
         /// </summary>
@@ -292,16 +264,11 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
 
             return this;
         }
-
         /// <summary>
         /// Indicates whether repository has been disposed
         /// </summary>
-        public bool IsDisposed
-        {
-            get;
-            set;
-        }
-
+        public bool IsDisposed { get; set; }
+        protected bool IsDisposedInternal { get; set; }
         /// <summary>
         /// Makes repository queryable
         /// </summary>
@@ -319,7 +286,6 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
         {
             return BuildQueryByFilterString(filterString);
         }
-
         /// <summary>
         /// Makes repository queryable and filter by predicate
         /// </summary>
@@ -389,12 +355,18 @@ namespace HelperExtensionsLibrary.EntityFramework.Testing
 
             return includeQuery.AsQueryable();
         }
-
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns> Enumerator that can be used to iterate through the collection.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             return AsEnumerable().GetEnumerator();
         }
-
+        /// <summary>
+        ///  Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>Enumerator that can be used to iterate through the collection.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
